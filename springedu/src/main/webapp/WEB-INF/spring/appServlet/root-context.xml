@@ -14,11 +14,11 @@
 	</bean>
 	<bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
 	    <property name="config" ref="environmentVariablesConfiguration" />
-	    <property name="password" value="skslrk" />
+	    <property name="password" value="gkrToaWkd" />
 	</bean>
 	
 	<!-- 환경에따라 자주 변경될 수 있는 내용은 properties파일로 분리하는것이 좋다 -->
-<!-- <context:property-placeholder location="classpath:/config/database.properties"/> -->
+<!-- 	<context:property-placeholder location="classpath:/config/database.properties"/> -->
 	<bean id="propertyConfigurer" class="org.jasypt.spring31.properties.EncryptablePropertyPlaceholderConfigurer">
 	    <constructor-arg ref="configurationEncryptor" />
 	    <property name="locations">
@@ -59,6 +59,10 @@
 	</context:component-scan>
 	
 </beans>
+
+
+
+
 
 
 

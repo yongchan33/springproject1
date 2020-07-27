@@ -1,10 +1,14 @@
 package com.kh.portfolio.member.controller;
 
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -20,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.kh.portfolio.common.PasswordGeneratorSVC;
+import com.kh.portfolio.common.mail.MailService;
 import com.kh.portfolio.member.svc.MemberSVC;
 import com.kh.portfolio.member.vo.MemberVO;
 
@@ -32,6 +38,12 @@ public class MemberController {
 	
 	@Inject
 	MemberSVC memberSVC;
+	
+	@Inject
+	PasswordGeneratorSVC passwordGeneratorSVC;
+	
+	@Inject
+	MailService mailService;
 	
 	//회원가입 화면
 	@GetMapping("/joinForm")
@@ -199,7 +211,7 @@ public class MemberController {
 			@RequestBody MemberVO memberVO
 			){
 		{
-	logger.info("ResponseEntity<Map> findID() 호출됨!!");
+	logger.info("ResponseEntity<Map> findPW() 호출됨!!");
 	logger.info("id:"+memberVO.getId());
 	logger.info("tel:"+memberVO.getTel());
 	logger.info("birth:"+memberVO.getBirth());
@@ -224,6 +236,77 @@ public class MemberController {
 	
   return res;
 }
-	}}
+	}
+	//비밀번호 찾기(Restfull 처리, 응답포맷:JSON)
+	@PostMapping(value="/pwmail", produces="application/json")
+	@ResponseBody
+	public ResponseEntity<Map> findPWMail(
+			@RequestBody MemberVO memberVO, HttpServletResponse response,HttpServletRequest request
+			){
+		{
+	logger.info("ResponseEntity<Map> findPW() 호출됨!!");
+	logger.info("id:"+memberVO.getId());
+	logger.info("tel:"+memberVO.getTel());
+	logger.info("birth:"+memberVO.getBirth());
+	ResponseEntity<Map> res = null;
+	String findPW = null;
+	
+	//문자열 birth를  java.sql.Date타입으로 변환
+	memberVO.setBirth(java.sql.Date.valueOf(memberVO.getBirth().toString()));
+	findPW = memberSVC.findPW(memberVO.getId(),memberVO.getTel(), memberVO.getBirth());
+	
+	Map<String,Object> map = new HashMap<>();
+	//1)비밀번호를 찾았으면
+	if(findPW != null) {
+		
+		//2)임시비밀번호 생성
+		String tmpPassword = passwordGeneratorSVC.generatorPassword(6);
+		
+		//3)임시비밀번호로 비밀번호 변경
+		memberSVC.changePW(memberVO.getId(),findPW, tmpPassword);
+		
+		//4)메일전송
+		
+
+			String mailTtile="신규 비밀번호 발송";
+			
+			
+			//로그인주소
+			StringBuffer url = new StringBuffer();
+			url.append("http://"	+request.getServerName());
+			url.append(":"				+request.getServerPort());
+			url.append(request.getContextPath());
+			url.append("/loginForm?id="+memberVO.getId());
+			//메일본문내용
+			StringBuffer sb = new StringBuffer();
+			sb.append("<html><body>");
+			sb.append("<meta http-equiv='Content-Type' content='text/html; charset=euc-kr'>");
+			sb.append("<h1>" + "신규비밀번호" + "<h1><br>");
+			sb.append("아래 비밀번호로 로그인 하셔서 비밀번호를 변경하세요.<br><br>");
+			sb.append("<b>비밀번호 : </b>");
+			sb.append(tmpPassword + "<br><br>");
+			sb.append("<a href='"+url.toString()+"'>로그인</a>");
+			sb.append("</body></html>");
+
+//			mailService.sendMail(to, "신규 비밀번호 발송", sb.toString());
+			mailService.sendMail(memberVO.getId(), mailTtile, sb.toString());
+			logger.info("메일을 발송하였습니다.!!");
+
+		map.put("rtcode","00"); 
+		map.put("result",findPW);
+		res = new ResponseEntity<Map>(map, HttpStatus.OK); //200
+		
+	}else {
+		map.put("rtcode","01"); 
+		map.put("result","찾고자 하는 아이디가 없습니다.");
+		res = new ResponseEntity<Map>(map, HttpStatus.OK); //200
+	}
+	
+  return res;
+}
+	}	
+
+
+}
 
 

@@ -47,14 +47,15 @@
       function okBtn_f(event){
     	  event.preventDefault();    	  
     	  const findedPWTag = document.getElementById('findedPW');
-    	  //찾은 비밀번호 발견되었으면
+    	  window.close();
+    	  /*//찾은 비밀번호 발견되었으면
     	  if(findedPWTag.textContent){   
     		  
     	  //부모창 접근은 window.opener속성 이용
 	    	  window.opener//
 	    	        .document.getElementById('pw').value = findedPWTag.textContent;
     	  	window.close();
-    	  }
+    	  }*/
       }
       
       //유효성 체크
@@ -114,7 +115,7 @@
             
             switch(jsonObj.rtcode){
             case "00" :
-            	findedPWTag.textContent = jsonObj.result;
+            	findedPWTag.textContent = '임시비밀번호를 발급하였습니다!!';
             	errmsgTag.textContent = '';
             	break;
             case "01" :
@@ -134,7 +135,7 @@
         //4)서비스요청
         xhttp.open(
           "POST",
-          "http://localhost:9080/${contextPath}/member/pw"
+          "http://localhost:9080/${contextPath}/member/pwmail"
         );
         xhttp.setRequestHeader(
           "Content-Type",
