@@ -1,35 +1,66 @@
 @charset "UTF-8";
-   form {
-      width:600px;
-    }
-    form  label {
-      display: inline-block;
-      
-      width:70px;
-    }
-form legend{
-  margin: 20px;
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
-  margin: 10px;
-
+form {
+	width: 700px;
+	margin:50px;
 }
-    form * {
-      box-sizing: border-box;
-    }
-    form ul > li {
-      display:flex;
-      margin:5px;
-    }
-    form ul >li:nth-last-child(1){
-      display: flex;
-      justify-content: flex-end;
 
-    }
-    form #bcontent{
-      width: 100%;
-    }
-    form ul li button{
-      margin-right: 3px;
-    }
+form  label {
+	display: inline-block;
+	width: 70px;
+	letter-spacing:0.3em;	/* 부모요소 폰트의 30%*/
+}
+form .svr_class{
+	font-size:0.8em;
+	font-weight:bold;
+	color:red;
+	
+}
+form legend {
+	margin: 20px;
+	font-weight: bold;
+	display: flex;
+	justify-content: center;
+	margin: 20px;
+}
+
+form input[name="btitle"] {
+	width: 80%;
+}
+
+form input[name="bid"] {
+	width: 50%;
+}
+
+form ul {
+	padding-left: 0px;
+}
+
+form * {
+	box-sizing: border-box;
+}
+
+form ul>li {
+	display: gird;
+	margin: 5px;
+	width: 100%;
+}
+form ul>li span{
+	grid-column:2/3;
+}
+
+form ul>li:nth-last-child(1) {
+	display: flex;
+	justify-content: flex-end;
+}
+
+form ul>li:nth-last-child(1)>button {
+	margin-left: 3px;
+}
+
+form #bcontent {
+	width: 90%;
+}
+
+form ul li button {
+	margin-right: 3px;
+}

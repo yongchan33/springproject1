@@ -1,5 +1,6 @@
 package com.kh.portpolio.member.dao;
 
+import java.sql.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,15 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.kh.portfolio.common.mail.MailService;
 import com.kh.portfolio.member.dao.MemberDAO;
 import com.kh.portfolio.member.vo.MemberVO;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring/root-context.xml"})
+@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring/*.xml"})
 public class MemberDAOImplXMLTest {
 
 	private final static Logger logger
@@ -31,6 +34,10 @@ public class MemberDAOImplXMLTest {
 	@Qualifier("memberDAOImplXML")
 	MemberDAO memberDAO;	
 
+	
+	@Autowired
+	MailService mailService;
+	
 	@Test			//테스트 대상에서 포함할때
 	@DisplayName("회원등록")
 	@Disabled //테스트 대상에서 제외할때
@@ -71,7 +78,6 @@ public class MemberDAOImplXMLTest {
 	
 	@Test
 	@DisplayName("회원전체조회")
-	@Disabled
 	void listAllMember() {
 		
 		List<MemberVO> list = memberDAO.listAllMember();
@@ -115,12 +121,11 @@ public class MemberDAOImplXMLTest {
 	@Disabled
 	void findID() {
 		String tel = "010-2222-3333";
-		String birth = "2000-03-01";
+		//String birth = "2000-03-01";
+		Date birth = java.sql.Date.valueOf("2000-03-01");		
+		String id = memberDAO.findID(tel, birth);
+		Assertions.assertEquals("test@test.com", id);
 		
-		/*
-		 * String id = memberDAO.findID(tel, birth);
-		 * Assertions.assertEquals("test@test.com", id);
-		 */
 	}
 	@Test
 	@DisplayName("비밀번호 찾기")
@@ -128,22 +133,23 @@ public class MemberDAOImplXMLTest {
 	void findPW() {
 		String id 		= "test@test.com";
 		String tel 		= "010-2222-3333";
-		String birth 	= "2000-03-01";
-		
-		/*
-		 * String pw = memberDAO.findPW(id,tel,birth); Assertions.assertEquals("4444",
-		 * pw);
-		 */
+		//String birth 	= "2000-03-01";
+		Date birth = java.sql.Date.valueOf("2000-03-01");				
+		String pw = memberDAO.findPW(id,tel,birth);
+		Assertions.assertEquals("1234", pw);
 		
 	}
 	
-	/*
-	 * @Test
-	 * 
-	 * @DisplayName("비밀번호변경") // @Disabled void changePW() { String id =
-	 * "test@test.com"; String pw = "3333"; int result = memberDAO.changePW(id, pw);
-	 * // Assertions.assertEquals(1,result);
-	 * 
-	 * Assertions.assertEquals(pw,memberDAO.listOneMember(id).getPw()); }
-	 */
+	@Test
+	@DisplayName("비밀번호변경")
+	@Disabled
+	void changePW() {
+		String id = "test@test.com";
+		String postpw = "4444";
+		String prepw = "4444";
+		int result = memberDAO.changePW(id, prepw,postpw);
+//		Assertions.assertEquals(1,result);
+		
+		Assertions.assertEquals(postpw,memberDAO.listOneMember(id).getPw());
+	}
 }
