@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class BoardSVCImpl implements BoardSVC {
 
 	@Inject
 	BoardDAO boardDAO;
+	
+	@Inject
+	SqlSession sqlSession;
 
 	// 게시글 작성
 	@Transactional	//트랜잭션 처리가 필요하다고 알려준다.
@@ -93,8 +97,9 @@ public class BoardSVCImpl implements BoardSVC {
 	// 게시글 목록
 	@Override
 	public List<BoardVO> list() {
-
-		return null;
+		List<BoardVO> list = null;
+		list = boardDAO.list();
+		return list;
 	}
 
 }

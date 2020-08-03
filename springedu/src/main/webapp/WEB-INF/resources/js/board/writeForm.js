@@ -28,7 +28,7 @@
   function listBtn_f(e){
     console.log("목록");
     // 목록리스트로 이동
-    location.href="/portfolio/board/list";
+    location.href="list";
   }
 
   //유효성체크
@@ -79,4 +79,5 @@
  		return false;
  	}
  	document.getElementById('files.error').textContent="";
+ 	return true;
  }

@@ -32,7 +32,7 @@ public class BoardVO {
 	private String bnickname;									//	BNICKNAME	VARCHAR2(30 BYTE)	Yes		5	"작성자이름"
 	private Timestamp	bcdate;									//	BCDATE	TIMESTAMP(6)	Yes	systimestamp 	6	작성일
 	private Timestamp	budate;									//	BUDATE	TIMESTAMP(6)	No	"systimestamp "	7	수정일
-	private int hit;													//	BHIT	NUMBER(5,0)	Yes	0 	8	조회수
+	private int bhit;													//	BHIT	NUMBER(5,0)	Yes	0 	8	조회수
 	@NotNull(message = "내용을 입력바랍니다.")
 	@Size(min=4, message = "내용은 최소 4자 이상 입력바랍니다.")
 	private String bcontent;									//	BCONTENT	CLOB	Yes		9	본문내용

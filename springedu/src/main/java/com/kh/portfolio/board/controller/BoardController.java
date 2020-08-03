@@ -52,8 +52,9 @@ public class BoardController {
 	}
 //게시글
 	@GetMapping("/list")
-	public String list(BoardVO boardVO) {
-
+	public String list(Model model) {
+		System.out.println("list호출");
+		model.addAttribute("list",boardSVC.list());
 		
 		return "/board/list";				
 	}
