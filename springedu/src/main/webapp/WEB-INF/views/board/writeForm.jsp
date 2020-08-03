@@ -36,27 +36,32 @@
 									<form:option value="1002">DATABASE</form:option>
 									<form:option value="1003">JAVA</form:option>
 								</form:select>
-								<form:errors cssClass="svr_msg" path="boardCategoryVO.cid"/>
+								<span class="client_msg" id="boardCategoryVO.cid.error"></span>
+								<form:errors cssClass="svr_msg" id="boardCategoryVO.cid.error"/>
 								
 						</li>
 						<li>
 							<form:label path="btitle">제목</form:label>
 							<form:input type="text" path="btitle" />
 							<form:errors cssClass="svr_msg" path="btitle"/>
+							<span class="client_msg" id="btitle.error"></span>
 						</li>
 						<li>
 							<form:label path="bid">작성자</form:label>
 							<form:input type="text" path="bid" />
 							<form:errors cssClass="svr_msg" path="bid"/>
+							<span class="client_msg" id="bid.error"></span>
 						</li>
 						<li>
 							<form:label path="bcontent">내용</form:label>
 							<form:textarea path="bcontent" rows="10"></form:textarea>
 							<form:errors cssClass="svr_msg" path="bcontent"/>
+							<span class="client_msg" id="bcontent.error"></span>
 						</li>
 						<li>
 							<form:label path="">첨부</form:label>
 							<form:input type="file" path="files" multiple="multiple" />
+							<span class="client_msg" id="files.error"></span>
 							<form:errors cssClass="svr_msg" path="files"/>
 						</li>
 

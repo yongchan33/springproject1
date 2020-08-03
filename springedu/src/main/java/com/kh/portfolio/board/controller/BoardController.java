@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -27,7 +28,7 @@ public class BoardController {
 	//게시글 작성(화면)
 	@GetMapping("/writeForm")
 	public String writeForm(
-			
+			@ModelAttribute("boardVO") BoardVO baordVO, // case1)
 			Model model
 			) {
 		model.addAttribute("boardVO",new BoardVO());
