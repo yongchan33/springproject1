@@ -49,6 +49,7 @@ public class BoardDAOimplXMLTest {
 	}
 		@Test
 		@DisplayName("게시글 목록")
+		@Disabled
 		void list() {
 			List<BoardVO> list = boardDAO.list();
 			logger.info("레코드갯수:" + list.size());
@@ -57,6 +58,17 @@ public class BoardDAOimplXMLTest {
 			 */
 			list.stream().forEach(System.out::println);
 			/* logger.info("게시글목록:" + list.toString()); */
+		}
+		
+		
+		@Test
+		@DisplayName("게시글 보기")
+		void view() {
+			String bnum="63";
+			BoardVO boardVO = boardDAO.view(bnum);
+			logger.info(boardVO.toString());
+			logger.info(String.valueOf(boardVO.getBoardCategoryVO().getCid()));
+			
 		}
 	
 }

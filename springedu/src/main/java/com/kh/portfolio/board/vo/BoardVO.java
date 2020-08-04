@@ -27,7 +27,7 @@ public class BoardVO {
 	@Size(min=2, max=50, message= "제목이 2~50자 까지 입력가능 합니다.")
 	private String btitle;										//	BTITLE	VARCHAR2(150 BYTE)	Yes		3	제목
 	@NotNull
-	@Pattern(regexp = "\\w+@\\w.\\w+(\\.\\w+)?", message="에미엘 형식으로 입력바랍니다. ex)admin@gmail.com")
+	@Pattern(regexp = "\\w+@\\w.\\w+(\\.\\w+)?", message="이메일 형식으로 입력바랍니다. ex)admin@gmail.com")
 	private String bid;												//	BID	VARCHAR2(40 BYTE)	Yes		4	MEMBER.ID
 	private String bnickname;									//	BNICKNAME	VARCHAR2(30 BYTE)	Yes		5	"작성자이름"
 	private Timestamp	bcdate;									//	BCDATE	TIMESTAMP(6)	Yes	systimestamp 	6	작성일
@@ -42,4 +42,5 @@ public class BoardVO {
 	
 	//첨부파일
 	private List<MultipartFile> files;
+	
 }
