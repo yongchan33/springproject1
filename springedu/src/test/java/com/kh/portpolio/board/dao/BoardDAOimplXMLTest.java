@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.kh.portfolio.board.dao.BoardDAO;
 import com.kh.portfolio.board.vo.BoardCategoryVO;
+import com.kh.portfolio.board.vo.BoardFileVO;
 import com.kh.portfolio.board.vo.BoardVO;
 
 @ExtendWith(SpringExtension.class)
@@ -28,6 +29,31 @@ public class BoardDAOimplXMLTest {
 	@Inject
 	@Qualifier("boardDAOImplXML")
 	BoardDAO boardDAO;
+	
+	@Test
+	@DisplayName("게시판 카테고리읽어오기")
+	void getCategory() {
+		List<BoardCategoryVO> list = boardDAO.getCategory();
+		//case1) 일반 for문
+		for(int i=0; i<list.size();i++) {
+			logger.info(list.get(i).toString());
+		}
+		//case2) 향상된 for문
+		for(BoardCategoryVO boardCategoryVO: list) {
+			logger.info(boardCategoryVO.toString());
+		}
+		//case3) 스트림사용
+		list.stream().forEach(BoardCategoryVO->{
+			System.out.println(BoardCategoryVO);
+		});
+		//case4) 스트림사용(단축)
+		list.stream().forEach(System.out::println);
+		
+		
+		
+		
+	}
+	
 	
 	@Test
 	@DisplayName("게시글 작성")
@@ -63,6 +89,7 @@ public class BoardDAOimplXMLTest {
 		
 		@Test
 		@DisplayName("게시글 보기")
+		@Disabled
 		void view() {
 			String bnum="63";
 			BoardVO boardVO = boardDAO.view(bnum);
@@ -70,5 +97,25 @@ public class BoardDAOimplXMLTest {
 			logger.info(String.valueOf(boardVO.getBoardCategoryVO().getCid()));
 			
 		}
-	
+		@Test
+		@DisplayName("첨부파일조회")
+		@Disabled
+		void getFiles() {
+			String bnum="82";
+			List<BoardFileVO> list = boardDAO.getFiles(bnum);
+			
+			list.stream().forEach(System.out::println);
+			Assertions.assertEquals(4, list.size());
+			
+		}
+		@Test
+		@DisplayName("조회수증가")
+		@Disabled
+		void updateBhit() {
+			String bnum="82";
+			int preBhit= boardDAO.view(bnum).getBhit();
+			boardDAO.updateBhit(bnum);
+			int postBhit = boardDAO.view(bnum).getBhit();
+			Assertions.assertEquals(postBhit, preBhit+1);
+		}
 }
