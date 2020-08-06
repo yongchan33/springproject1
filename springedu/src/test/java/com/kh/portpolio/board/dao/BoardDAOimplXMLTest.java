@@ -32,6 +32,7 @@ public class BoardDAOimplXMLTest {
 	
 	@Test
 	@DisplayName("게시판 카테고리읽어오기")
+	@Disabled
 	void getCategory() {
 		List<BoardCategoryVO> list = boardDAO.getCategory();
 		//case1) 일반 for문
@@ -117,5 +118,12 @@ public class BoardDAOimplXMLTest {
 			boardDAO.updateBhit(bnum);
 			int postBhit = boardDAO.view(bnum).getBhit();
 			Assertions.assertEquals(postBhit, preBhit+1);
+		}
+		@Test
+		@DisplayName("첨부파일다운로드")
+		void deleteFile() {
+			String fid = "64";
+			BoardFileVO boardFileVO = boardDAO.viewFile(fid);
+			logger.info(boardFileVO.toString());
 		}
 }
