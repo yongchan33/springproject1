@@ -15,11 +15,10 @@
 		<org.slf4j-version>1.7.30</org.slf4j-version>
 		<jackson-databind-version>2.11.1</jackson-databind-version>
 		<junit-jupiter-version>5.6.2</junit-jupiter-version>
-		<hibernate-core-verion>5.4.19.Final</hibernate-core-verion>
-		<hibernate-validator-version>6.1.5.Final</hibernate-validator-version>
+		<hibernate-core-version>5.4.19.Final</hibernate-core-version>
 	</properties>
 
-	<!-- oracle dirver 저장소 -->
+	<!-- oracle driver 저장소 -->
 	<repositories>
 		<repository>
 			<id>oracle</id>
@@ -55,22 +54,22 @@
 			<artifactId>aspectjrt</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
-
-
-		<!-- AOP 의존성 종료 -->
+		<!-- AOP 의존성 끝 -->
 
 		<!-- Logging -->
-		<dependency>
+ 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${org.slf4j-version}</version>
@@ -81,7 +80,7 @@
 			<version>${org.slf4j-version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		<dependency>
+<!--<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${org.slf4j-version}</version>
@@ -110,8 +109,16 @@
 				</exclusion>
 			</exclusions>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency> -->
 
+		<!-- slf4j구현 클래스로 logback를 사용하겠다는의미  -->		
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-classic</artifactId>
+		    <version>1.2.3</version>
+<!-- 		    <scope>test</scope> -->
+
+		</dependency>
 		<!-- @Inject -->
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -120,7 +127,7 @@
 		</dependency>
 
 		<!-- Servlet -->
-		<dependency>
+<!-- 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
@@ -136,7 +143,32 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
+		</dependency> -->
+		<dependency>
+	    <groupId>javax.servlet</groupId>
+	    <artifactId>javax.servlet-api</artifactId>
+	    <version>4.0.1</version>
+	    <scope>provided</scope>
 		</dependency>
+		<!-- servlet 끝 -->
+		
+		<!-- JSTL 시작 -->
+		<dependency>
+	    <groupId>org.apache.taglibs</groupId>
+	    <artifactId>taglibs-standard-impl</artifactId>
+	    <version>1.2.5</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.taglibs</groupId>
+		    <artifactId>taglibs-standard-spec</artifactId>
+		    <version>1.2.5</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.taglibs</groupId>
+		    <artifactId>taglibs-standard-jstlel</artifactId>
+		    <version>1.2.5</version>
+		</dependency>
+		<!-- JSTL 끝 -->
 
 		<!-- Test -->
 		<dependency>
@@ -260,26 +292,35 @@
 			<version>5.16.0</version>
 		</dependency>
 
+		<!-- owl carousel -->
+		<dependency>
+		    <groupId>org.webjars.bower</groupId>
+		    <artifactId>owl.carousel</artifactId>
+		    <version>2.3.4</version>
+		</dependency>
 		<!-- 웹관련 라이브러리 종료 -->
+
 		<!-- mail 시작 -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
+
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>javax.mail-api</artifactId>
 			<version>1.6.2</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
 			<version>1.6.2</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.jasypt/jasypt -->
-		<!-- jasypt(Java Simplifed Encryption)를 이용한 properties 파일 암호화 -->
+		<!-- mail 종료 -->
+
+		<!-- Jasypt(Java Simplified Encryption)를 이용한 Properties 파일 암호화 -->
 		<dependency>
 			<groupId>org.jasypt</groupId>
 			<artifactId>jasypt</artifactId>
@@ -291,35 +332,53 @@
 			<version>1.9.3</version>
 		</dependency>
 
-
-		<!-- mail 종료 -->
 		<!-- 파일 업로드 -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.4</version>
 		</dependency>
-		
-		<!-- JPA(Java Persitence api) Validation시작 -->
+<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+<dependency>
+    <groupId>commons-codec</groupId>
+    <artifactId>commons-codec</artifactId>
+    <version>1.14</version>
+</dependency>
+
+		<!-- JPA(Java Persitence API) Validation 시작 -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate-core-verion}</version>
+			<version>${hibernate-core-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate-core-verion}</version>
+			<version>${hibernate-core-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>${hibernate-validator-version}</version>
+			<version>6.1.5.Final</version>
 		</dependency>
+		<!-- JPA(Java Persitence API) Validation 종료 -->
 
-		<!-- JPA(Java Persitence api) 종료 -->
-
-
+		<!-- log4j2 : 데이터베이스 연동 오류발생시 상세 로그기록-->
+		<dependency>
+		    <groupId>org.bgee.log4jdbc-log4j2</groupId>
+		    <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
+		    <version>1.16</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-api</artifactId>
+		    <version>2.13.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>2.13.3</version>
+		</dependency>	
 	</dependencies>
 	<build>
 		<plugins>
@@ -342,8 +401,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.5.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
 					<compilerArgument>-Xlint:all</compilerArgument>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>

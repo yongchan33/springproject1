@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.kh.portfolio.member.svc.MemberSVC;
@@ -24,10 +23,13 @@ public class LoginController {
 	@Inject
 	MemberSVC memberSVC;
 	
-	//로그인 화면
+	//로그인 화면"/loginForm?reqURI="+reqURI
 	@GetMapping("/loginForm")
-	public String loginForm() {
+	public String loginForm(
+			@RequestParam(value="reqURI",required = false) String reqURI,
+			Model model) {
 		
+		model.addAttribute("reqURI", reqURI);
 		return "/member/loginForm";
 	}
 	
@@ -36,11 +38,12 @@ public class LoginController {
 	public String login(
 			@RequestParam("id") String id,
 			@RequestParam("pw") String pw,
+			@RequestParam("reqURI") String reqURI,
 			HttpSession session,
 			Model model) {
-		logger.info("String login()호출됨");
-		logger.info("id : " + id);
-		logger.info("pw : " + pw);
+//		logger.info("String login()호출됨");
+//		logger.info("id : " + id);
+//		logger.info("pw : " + pw);
 		
 		MemberVO memberVO = memberSVC.listOneMember(id);
 
@@ -59,7 +62,7 @@ public class LoginController {
 				return "/member/loginForm";
 			}
 		}	
-		return "redirect:/";
+		return "redirect:/"+reqURI;
 	}
 	
 	//로그아웃
@@ -72,4 +75,3 @@ public class LoginController {
 	}
 	
 }
-

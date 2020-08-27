@@ -4,7 +4,7 @@
 <%@ include file="/WEB-INF/views/include/common.jsp"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <title>게시글 보기</title>
-<link rel="stylesheet" href="${contextPath }/css/main.css">
+<link rel="stylesheet" href="${contextPath }/css/board/board.css">
 <link rel="stylesheet" href="${contextPath }/css/board/readForm.css">
 <script defer src="${contextPath }/js/board/readForm.js"></script>
 </head>
@@ -24,16 +24,17 @@
 			<div class="content">
 				<form:form id="writeFrm" 
 									 method="post"
-									 action="${contextPath }/board/modify" 
+									 action="${contextPath }/board/modify/${requestScope.returnPage }" 
 									 enctype="multipart/form-data"
 									 modelAttribute="boardVO">
-					<form:hidden path="bnum"/>				 
+					<form:hidden path="bnum"/>
+					<form:hidden path="bid" value="${sessionScope.member.id }"/>										 
 					<legend id="title">게시글 보기</legend>
 					<ul>
 						<li>
 							<form:label path="boardCategoryVO.cid">분류</form:label> 
 							<form:select	path="boardCategoryVO.cid" disabled="true">
-								<option value="0">선택</option>
+								<form:option value="0">선택</form:option>
 								<form:options path="boardCategoryVO.cid"
 															items="${boardCategory }"
 															itemValue="cid"
@@ -49,8 +50,8 @@
 							<form:errors cssClass="svr_msg" path="btitle"/>
 						</li>
 						<li>
-							<form:label path="bid">작성자</form:label>
-							<form:input type="text" path="bid" readonly="true"/>
+							<label for="bid">작성자</label>
+							<input type="text" id="bid" value="${boardVO.bnickname }(${boardVO.bid })" readonly="true"/>
 							<span class="client_msg" id="bid.error"></sapn>								
 							<form:errors cssClass="svr_msg" path="bid"/>
 						</li>
@@ -68,25 +69,27 @@
 						</li>	
 						<li class="btnGrp">
 							<!-- 읽기모드 버튼 -->	
-							<form:button id="replyBtn" 	type="button" class="btn rmode btn-outline-success">답글</form:button>
-							<form:button id="modifyBtn" type="button" class="btn rmode btn-outline-danger">수정</form:button>
-							<form:button id="deleteBtn" type="button" class="btn rmode btn-outline-info" data-bnum="${requestScope.boardVO.bnum }"> 삭제</form:button>
+							<form:button id="replyBtn" 	class="btn rmode btn-outline-success" data-bnum="${requestScope.boardVO.bnum }" data-returnPage="${requestScope.returnPage }">답글</form:button>
+							<form:button id="modifyBtn" class="btn rmode btn-outline-danger">수정</form:button>
+							<form:button id="deleteBtn" class="btn rmode btn-outline-info" data-bnum="${requestScope.boardVO.bnum }" data-returnPage="${requestScope.returnPage }"> 삭제</form:button>
 							<!-- 수정모드 버튼 -->
-							<form:button id="cancelBtn" type="button" class="btn umode btn-outline-danger">취소</form:button>
-							<form:button id="saveBtn" 	type="button" class="btn umode btn-outline-success">저장</form:button>
+							<form:button id="cancelBtn" class="btn umode btn-outline-danger">취소</form:button>
+							<form:button id="saveBtn" 	class="btn umode btn-outline-success" data-returnPage="${requestScope.returnPage }">저장</form:button>
 							<!-- 공통버튼 -->	
-							<form:button id="listBtn" 	type="button" class="btn btn-outline-info"> 목록</form:button>
+							<form:button id="listBtn" 	class="btn btn-outline-info" data-returnPage="${requestScope.returnPage }"> 목록</form:button>
 						</li>
 						<!-- 첨부목록 -->
 						<li>
 							<form:label path="">첨부목록</form:label>
 							<c:if test="${!empty files }">
-							<div>
+							<div  id="fileList">
 								<c:forEach var="file" items="${requestScope.files }">
 								<p style="display:flex">
 									<a href="${contextPath }/board/file/${file.fid}">${file.fname }</a>
 									<span>(${file.fsize/1000 } kb)</span>			
-									<span class="umode"><i style="padding-left:5px"class="fas fa-backspace"></i></span>						
+									<span class="umode">
+										<a href="#"><i style="padding-left:5px" class="fas fa-backspace" data-fid="${file.fid }"></i></a>
+									</span>						
 								</p>
 								</c:forEach>
 							</div>
@@ -99,7 +102,9 @@
 						</li>
 					</ul>
 				</form:form>
-			</div>
+				<!-- 댓글 -->
+				<%@include file="/WEB-INF/views/board/rereply.jsp" %>
+			</div>			
 		</div>
 	</main>
 	<!-- 푸터 -->

@@ -26,4 +26,5 @@ public interface MemberDAO {
 	int changePW(String id, String prepw, String postpw);
 	//프로파일 이미지 조회
 	byte[] findProfileImg(String id);
+
 }

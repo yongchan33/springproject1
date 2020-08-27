@@ -10,19 +10,37 @@ public class PropertiesEncryptor {
 		//enc.setPassword("gkrToaWkd");
 		enc.setPassword("skslrk");
 		
-		//db암호화
+/*		//db암호화
 		System.out.println(enc.encrypt("oracle.jdbc.driver.OracleDriver"));
-		System.out.println(enc.encrypt("jdbc:oracle:thin:@127.0.0.1:1521:xe"));
-		System.out.println(enc.encrypt("portfolio"));
-		System.out.println(enc.encrypt("portfolio1234"));
-
+//	System.out.println(enc.encrypt("net.sf.log4jdbc.sql.jdbcapi.DriverSpy"));
+	System.out.println(enc.encrypt("jdbc:oracle:thin:@127.0.0.1:1521:orcl"));
+//	System.out.println(enc.encrypt("jdbc:log4jdbc:oracle:thin:@127.0.0.1:1521:orcl"));
+	System.out.println(enc.encrypt("portfolio"));
+	System.out.println(enc.encrypt("portfolio1234"));
+	
+	//mail암호화
+	System.out.println(enc.encrypt("sang105kr@gmail.com"));
+	System.out.println(enc.encrypt(""));
+	
+	//복호화
+	System.out.println(enc.decrypt("hUcYk7JR5X2aPkEsKSbYgU+G7J5F/Xqf"));
+	}*/
 		
-		//mail암호화
-		System.out.println(enc.encrypt("skslrk00@gmail.com"));
-		System.out.println(enc.encrypt("159263lsg1136!@"));
 		
-		//복호화
-		//System.out.println(enc.decrypt("hUcYk7JR5X2aPkEsKSbYgU+G7J5F/Xqf"));
+		
+		//db암호화
+//	System.out.println(enc.encrypt("oracle.jdbc.driver.OracleDriver"));
+	System.out.println(enc.encrypt("net.sf.log4jdbc.sql.jdbcapi.DriverSpy"));
+//	System.out.println(enc.encrypt("jdbc:oracle:thin:@127.0.0.1:1521:orcl"));
+	System.out.println(enc.encrypt("jdbc:log4jdbc:oracle:thin:@127.0.0.1:1521:xe"));
+	System.out.println(enc.encrypt("portfolio"));
+	System.out.println(enc.encrypt("portfolio1234"));
+	
+	//mail암호화
+	System.out.println(enc.encrypt("skslrk00@gmail.com"));
+	
+	//복호화
+	//System.out.println(enc.decrypt("hUcYk7JR5X2aPkEsKSbYgU+G7J5F/Xqf"));
 	}
 
 }

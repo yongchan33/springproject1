@@ -1,22 +1,24 @@
 package com.kh.portfolio.board.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kh.portfolio.board.vo.BoardCategoryVO;
 import com.kh.portfolio.board.vo.BoardFileVO;
 import com.kh.portfolio.board.vo.BoardVO;
-import com.kh.portfolio.common.mail.MailService;
+
 
 @Repository
 public class BoardDAOImplXML implements BoardDAO {
+	
 	private static final Logger logger =
 			LoggerFactory.getLogger(BoardDAOImplXML.class);
 	
@@ -75,15 +77,40 @@ public class BoardDAOImplXML implements BoardDAO {
 		boardVO = sqlSession.selectOne("mappers.BoardDAO-mapper.view", Long.valueOf(bnum));
 		return boardVO;
 	}
+
 	//게시글 목록
 	@Override
 	public List<BoardVO> list() {
 		List<BoardVO> list = null;
 		
-		list = sqlSession.selectList("mappers.BoardDAO-mapper.list");
+		list = sqlSession.selectList("mappers.BoardDAO-mapper.list2");
 		
 		return list;
 	}
+	
+	//게시글 목록
+	@Override
+	public List<BoardVO> list(int startRec, int endRec) {
+		List<BoardVO> list = null;
+		Map<String,Object> map = new HashMap<>();
+		map.put("startRec", startRec);
+		map.put("endRec", endRec);
+		list = sqlSession.selectList("mappers.BoardDAO-mapper.list3",map);		
+		return list;
+	}
+	//게시글 목록(검색포함)
+	@Override
+	public List<BoardVO> list(int startRec, int endRec, String searchType, String keyword) {
+		List<BoardVO> list = null;
+		Map<String,Object> map = new HashMap<>();
+		map.put("startRec", startRec);
+		map.put("endRec", endRec);
+		map.put("searchType", searchType);
+		map.put("keyword", keyword);
+		list = sqlSession.selectList("mappers.BoardDAO-mapper.list",map);		
+		return list;
+	}
+	
 	//파일첨부
 	@Override
 	public int addFile(BoardFileVO boardFileVO) {
@@ -114,6 +141,36 @@ public class BoardDAOImplXML implements BoardDAO {
 		boardFileVO = sqlSession.selectOne("mappers.BoardDAO-mapper.viewFile", Long.valueOf(fid));		
 		return boardFileVO;
 	}
-	
 
+	//게시글 답글
+	@Override
+	public int reply(BoardVO boardVO) {
+		//1) 이전답글 step업데이트(최초원글 답글중 부모글보다 답글단계가 큰경우 +1증가)
+		updateStep(boardVO.getBgroup(), boardVO.getBstep());
+		
+		//2) 답글달기
+		return sqlSession.insert("mappers.BoardDAO-mapper.reply", boardVO);
+	}
+
+	//이전답글 step 업데이트
+	private int updateStep(int bgroup, int bstep) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("bgroup", bgroup);
+		map.put("bstep", bstep);
+		return sqlSession.update("mappers.BoardDAO-mapper.updateStep", map);
+				
+	}
+
+	//게시글 총 레코드 수 
+	@Override
+	public int totalRecordCount() {
+		return sqlSession.selectOne("mappers.BoardDAO-mapper.totalRecordCount");
+	}
+	@Override
+	public int totalRecordCount(String searchType, String keyword) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("searchType", searchType);
+		map.put("keyword", keyword);
+		return sqlSession.selectOne("mappers.BoardDAO-mapper.searchedTotalRecordCount",map);
+	}
 }

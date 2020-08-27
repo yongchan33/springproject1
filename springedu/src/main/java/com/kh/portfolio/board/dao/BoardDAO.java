@@ -1,5 +1,4 @@
 package com.kh.portfolio.board.dao;
-
 import java.util.List;
 
 import com.kh.portfolio.board.vo.BoardCategoryVO;
@@ -23,6 +22,11 @@ public interface BoardDAO {
 	BoardVO view(String bnum);
 	//게시글 목록
 	List<BoardVO> list();
+	//게시글 목록
+	List<BoardVO> list(int startRec, int endRec);
+	//게시글 목록
+	List<BoardVO> list(int startRec, int endRec, String searchType, String keyword);
+	
 	//파일첨부
 	int addFile(BoardFileVO boardFileVO);
 	//첨부파일조회
@@ -32,4 +36,11 @@ public interface BoardDAO {
 	
 	//첨부파일 다운로드
 	BoardFileVO viewFile(String fid);
+	
+	//게시글 답글
+	int reply(BoardVO boardVO);
+	
+	//게시글 총 레코드 수 
+	int totalRecordCount();	
+	int totalRecordCount(String searchType, String keyword);
 }

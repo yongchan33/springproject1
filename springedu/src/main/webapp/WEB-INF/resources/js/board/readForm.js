@@ -7,6 +7,7 @@ const cancelBtn = document.getElementById("cancelBtn");
 const saveBtn  	= document.getElementById("saveBtn");
 /* 공통 버튼 */
 const listBtn   = document.getElementById("listBtn");
+const fileList  = document.getElementById("fileList");
 
 if(replyBtn) 	replyBtn.addEventListener("click", replyBtn_f);
 if(modifyBtn) modifyBtn.addEventListener("click", modifyBtn_f);
@@ -16,14 +17,22 @@ if(cancelBtn) cancelBtn.addEventListener("click", cancelBtn_f);
 if(saveBtn) 	saveBtn.addEventListener("click", saveBtn_f);
 if(listBtn) 	listBtn.addEventListener("click", listBtn_f);
 
+if(fileList)  fileList.addEventListener("click", fileList_f);
+
 changeMode(false); //읽기모드
 
 //답글
 function replyBtn_f(e){
+	e.preventDefault();
 	console.log('답글');
+	const bnum = e.target.getAttribute("data-bnum");
+	const returnPage = e.target.getAttribute("data-returnPage");
+	const url = `/portfolio/board/reply/${bnum}/${returnPage}`;
+	window.location.href= url;
 }
 //수정
 function modifyBtn_f(e){
+	e.preventDefault();
 	console.log('수정');
 	changeMode(true); //수정모드
 }
@@ -43,7 +52,7 @@ function changeMode(modeFlag){
 		document.getElementById('bcontent').removeAttribute('readOnly');
 		
 		Array.from(rmodes).forEach(rmode=>{rmode.style.display="none";});
-		Array.from(umodes).forEach(umode=>{umode.style.display="block";});
+		Array.from(umodes).forEach(umode=>{umode.style.display="grid";});
 		
 		modeFlag = false;
 	//수정모드	-> 읽기모드
@@ -55,20 +64,21 @@ function changeMode(modeFlag){
 		document.getElementById('btitle').setAttribute('readOnly',true);
 		document.getElementById('bcontent').setAttribute('readOnly',true);
 		
-		Array.from(rmodes).forEach(rmode=>{rmode.style.display="block";});
+		Array.from(rmodes).forEach(rmode=>{rmode.style.display="grid";});
 		Array.from(umodes).forEach(umode=>{umode.style.display="none";});		
 		
 		modeFlag = true;
 	}
 }
 
-
 //삭제
 function deleteBtn_f(e){
+	e.preventDefault();
 	console.log('삭제');
 	if(confirm("삭제하시겠습니까?")){
 		const bnum = e.target.getAttribute("data-bnum");
-		const url = `/portfolio/board/delete/${bnum}`;
+		const returnPage = e.target.getAttribute("data-returnPage");
+		const url = `/portfolio/board/delete/${bnum}/${returnPage}`;
 		window.location.href = url;
 	}
 }
@@ -98,10 +108,12 @@ function saveBtn_f(e) {
 
 //목록
 function listBtn_f(e) {
-  console.log("목록");
+	e.preventDefault();
+	const returnPage = e.target.getAttribute('data-returnPage');
   //목록리스트로 이동
-  location.href = "/portfolio/board/list";
+  location.href = "/portfolio/board/list/"+returnPage;
 }
+
 
 //유효성 체크
 function checkValidation(){
@@ -167,4 +179,48 @@ function checkValidation(){
 	}
 	
 	return true;
+}
+
+//파일삭제
+function fileList_f(e){
+	//이벤트 소스 요소
+	console.log(e.target);
+	
+	//이벤트를 등록한 요소
+	console.log(e.currentTarget);
+	
+	if(e.target.tagName !== 'I') return false;
+	if(!confirm('삭제하시겠습니까?')) return false;
+	
+	const iTag = e.target;
+	const fid  = e.target.getAttribute("data-fid");
+	
+	//AJAX 사용
+	//1) XMLHttpRequest 객체 생성
+	const xhttp = new XMLHttpRequest();
+	
+	//2) 서비스 요청
+	const url = `http://localhost:9080/portfolio/board/file/${fid}`;
+	xhttp.open("DELETE",url);
+	xhttp.send();
+	
+	//3) 서버응답처리
+  //readyState
+  // 0 : open()가 호출되지 않은 상태
+  // 1 : open()가 실행된 상태 server 연결됨
+  // 2 : send()가 실행된 상태,  서버가 클라이언트 요청을 받았음.
+  // 3 : 서버가 클라이언트 요청 처리중. 응답헤더는 수신했으나 바디가 수신중인 상태
+  // 4 : 서버가 클라이언트의 요청을 완료했고 서버도 응답이 완료된상태	
+	xhttp.addEventListener("readystatechange",ajaxCall);
+	function ajaxCall(e){
+		if(this.readyState == 4 && this.status == 200){
+			//서버에서 파일 삭제를 처리했으면
+			if(this.responseText == "success") {
+				let pTag = iTag.parentElement.parentElement.parentElement;
+				fileList.removeChild(pTag);
+			}else{
+				console.log('파일삭제 실패!!');
+			}
+		}
+	}
 }

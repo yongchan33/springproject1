@@ -1,10 +1,12 @@
 package com.kh.portfolio.board.controller;
-
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -28,91 +30,138 @@ import com.kh.portfolio.board.svc.BoardSVC;
 import com.kh.portfolio.board.vo.BoardCategoryVO;
 import com.kh.portfolio.board.vo.BoardFileVO;
 import com.kh.portfolio.board.vo.BoardVO;
+import com.kh.portfolio.board.vo.CodeDecodeVO;
+import com.kh.portfolio.member.vo.MemberVO;
 
 @Controller
 @RequestMapping("/board")
 public class BoardController {
-	private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
-
+	
+	private static final Logger logger
+		= LoggerFactory.getLogger(BoardController.class);
+	
 	@Inject
 	BoardSVC boardSVC;
-
-	// 메소드레벨 vs 매개변수 레벨에서 의 차이를 알아야댐.
-	// 모든view page에서 접근이 가능하다.
-	//현재 컨트롤러에서 만들어지는 view페이지내에서 boardCategoryVO 이름으로 참조가 가능하다.
-	@ModelAttribute("boardCategory")
+		
+	//현재 컨트롤러에서 만들어지는 view페이지내에서  boardCategoryVO 이름으로 참조가 가능하다
+	@ModelAttribute("boardCategory") 
 	public List<BoardCategoryVO> getCategory() {
 		return boardSVC.getCategory();
 	}
-	// 게시글 작성할때 카테고리가 필요할때 다른url요청에서도 카테고리목록이 필요하면 모든뷰에 대해서
-	// 모델이 사용 가능하다
-
-	// 작성화면 전달함 modelattribute를 전달할 이유 : string form tag와 연결하기 위하여 전달함.
-	// boardVO로 VIEW에서 사용이 가능하도록 modelAtribute에 넘겨줌
-	// el표현식으로 기존에는 request.~~이런식으로 했었는데 지금은 modelAttribute를 사용하여
-	// 대체가능함.
-	// 게시글 작성(화면)
+	
+	@ModelAttribute("codeDecodeList")
+	public List<CodeDecodeVO> getCode(){
+		List<CodeDecodeVO> codeDecodeList = new ArrayList<>();
+		codeDecodeList.add(new CodeDecodeVO("TC","제목+내용"));
+		codeDecodeList.add(new CodeDecodeVO("T","제목"));
+		codeDecodeList.add(new CodeDecodeVO("C","내용"));
+		codeDecodeList.add(new CodeDecodeVO("I","아이디"));
+		codeDecodeList.add(new CodeDecodeVO("N","별칭"));
+		codeDecodeList.add(new CodeDecodeVO("A","전체"));		
+		
+		return codeDecodeList;
+	}
+	
+	//게시글 작성(화면)
 	@GetMapping("/writeForm")
-	public String writeForm(@ModelAttribute("boardVO") BoardVO baordVO, // case1)
+	public String writeForm(
+			@ModelAttribute("boardVO") BoardVO boardVO, //case 1)  
 			Model model) {
-		// case2)
-//		model.addAttribute("boardVO",new BoardVO());
+//case 2)		
+//		model.addAttribute("boardVO", new BoardVO());
+		
 		return "/board/writeForm";
 	}
-
-	// 어떤 페이지에서 작성할때 잘못입력하면 입력한값들이 날라감! 그래서 요청을할때 boardVO를 담아서
-	// valid 유효성체크 / 위에는 빈값으로해서 화면과 매핑이 되지만, 여기서는 boardVO를 받아서
-	// 저장하는단계, 사용자가 작성한 데이터의 유효성 체크를 해서 오류가나면 페이지를 보여주는데
-	// 기존에는 다시 작성할때 데이터가 없었으나, @ModelAttribute 사용하면 BoardVO에 담아서오도록함.
-	// 그리고 다시 작성 할때 boardVO로 접근이 가능함.
-	// 기존에는 Model model 받아서 addAttribute 사용해서 넘겨주는 식으로 사용했음.
-	// 게시글 작성처리
+	
+	//게시글 작성처리
 	@PostMapping("/write")
-	public String wirte(
+	public String write(
+			@Valid @ModelAttribute("boardVO") BoardVO boardVO,
+			BindingResult result,
+			HttpServletRequest request
+			//Model model
+			) {
 
-			@Valid @ModelAttribute("boardVO") BoardVO boardVO, // 유효성 체크를 하겠다.
-			BindingResult result) {
-
-		if (result.hasErrors()) {
+		if(result.hasErrors()) {
+			//model.addAttribute("boardVO", boardVO);
 			return "/board/writeForm";
 		}
+		
+		MemberVO memberVO = (MemberVO)request.getSession().getAttribute("member");
+		boardVO.setBid(memberVO.getId());
+		boardVO.setBnickname(memberVO.getNickname());
+		
 		boardSVC.write(boardVO);
-		return "redirect:/board/list";
+
+		return "redirect:/board/list"; 
 	}
-
-//게시글
-	@GetMapping("/list")
-	public String list(Model model) {
-		System.out.println("list호출");
-		model.addAttribute("list", boardSVC.list());
-
+	
+	//게시글 목록
+//	@GetMapping("/list")
+//	public String list(Model model) {
+//		
+//		model.addAttribute("list", boardSVC.list());
+//		
+//		return "/board/list";
+//	}
+	
+	//게시글 목록
+	@GetMapping({"/list",
+							 "/list/{reqPage}",
+							 "/list/{reqPage}/{searchType}/{keyword}"})
+	public String list(
+			@PathVariable(value="reqPage",required = false) Optional<Integer> reqPage,
+			@PathVariable(value="searchType",required = false) String searchType,
+			@PathVariable(value="keyword",required = false) String keyword,
+			Model model
+			) {
+		//url경로상에 reqPage값이 존재하지않으면 1로 설정함.
+//		int page = 1;
+//		if(reqPage.isPresent()) {
+//			page = reqPage.get();
+//		}
+//		int page = (reqPage.isPresent()) ? reqPage.get() : 1;
+//		
+//		logger.info("reqPage:"+reqPage.orElse(1));
+		
+		model.addAttribute("list", boardSVC.list(reqPage.orElse(1),searchType,keyword));
+		model.addAttribute("findCriteria", boardSVC.getFindCriteria(reqPage.orElse(1),searchType,keyword));
 		return "/board/list";
 	}
-
-//게시글 보기
-	@GetMapping("/view/{bnum}")
-	public String view(@PathVariable("bnum") String bnum, Model model) {
-
-		Map<String, Object> map = boardSVC.view(bnum);
-		BoardVO boardVO = (BoardVO) map.get("board");
+	
+	//게시글 보기
+	@GetMapping("/view/{bnum}/{returnPage}")
+	public String view(
+			@PathVariable("bnum") String bnum,
+			@PathVariable("returnPage") String returnPage,
+			Model model) {
+		
+		Map<String,Object> map = boardSVC.view(bnum);
+		
+		BoardVO boardVO = (BoardVO)map.get("board");
+		
 		List<BoardFileVO> files = null;
-		if (map.get("files") != null) {
-			files = (List<BoardFileVO>) map.get("files");
+		if(map.get("files") != null) {
+			files = (List<BoardFileVO>)map.get("files");
 		}
-
+		
 		model.addAttribute("boardVO", boardVO);
 		model.addAttribute("files", files);
-
+		model.addAttribute("returnPage", returnPage);
+		
 		return "/board/readForm";
 	}
 	
 	//게시글삭제
-	@GetMapping("/delete/{bnum}")
-	public String delete(@PathVariable("bnum") String bnum) {
+	@GetMapping("/delete/{bnum}/{returnPage}")
+	public String delete(
+			@PathVariable("bnum") String bnum,
+			@PathVariable("returnPage") String returnPage
+			) {
 		
 		boardSVC.delete(bnum);
 		
-		return "redirect:/board/list";
+		return "redirect:/board/list/"+returnPage;
 	}
 	
 	//첨부파일 다운로드
@@ -144,19 +193,20 @@ public class BoardController {
 	}
 	
 	//게시글 수정
-	@PostMapping("/modify")
+	@PostMapping("/modify/{returnPage}")
 	public String modify(
+			@PathVariable("returnPage") String returnPage,
 			@Valid @ModelAttribute("boardVO") BoardVO boardVO,
 			BindingResult result) {
 		//바인딩시 오류가 발생할경우
 		if(result.hasErrors()) {
-			return "/board/readForm";
+			return "/board/readForm/"+returnPage;
 		}
 		
 		//수정
 		boardSVC.modify(boardVO);
 		
-		return "redirect:/board/view/"+boardVO.getBnum();
+		return "redirect:/board/view/"+boardVO.getBnum()+"/"+returnPage;
 	}
 	
 	//게시글 첨부파일 개별 삭제
@@ -175,5 +225,47 @@ public class BoardController {
 		}
 		
 		return res;
+	}
+	
+	//게시글 답글작성(화면)
+	@GetMapping("/reply/{bnum}/{returnPage}")
+	public String replyForm(
+			@PathVariable("returnPage") String returnPage,
+			@PathVariable("bnum") String bnum,
+			Model model) {
+		
+		//부모글 가져오기
+		Map<String,Object> map = boardSVC.view(bnum);
+		BoardVO boardVO = (BoardVO)map.get("board");
+		
+		logger.info("reply:"+boardVO);
+		
+		boardVO.setBid("");
+		boardVO.setBnickname("");
+		boardVO.setBtitle("[답글] "+boardVO.getBtitle());
+		boardVO.setBcontent("[원글] " + boardVO.getBcontent());
+		
+		model.addAttribute("boardVO", boardVO);
+		model.addAttribute("returnPage", returnPage);
+		return "/board/replyForm";
+	}
+	
+	//게시글 답글작성
+	@PostMapping("/reply/{returnPage}")
+	public String reply(
+			@PathVariable("returnPage") String returnPage,
+			@Valid @ModelAttribute BoardVO boardVO,
+			BindingResult result,
+			HttpServletRequest request) {
+		
+		if(result.hasErrors()) {
+			return "/board/replyForm";
+		}
+		MemberVO memberVO = (MemberVO)request.getSession().getAttribute("member");
+		boardVO.setBid(memberVO.getId());
+		boardVO.setBnickname(memberVO.getNickname());
+		boardSVC.reply(boardVO);
+		
+		return "redirect:/board/list/"+returnPage;
 	}
 }

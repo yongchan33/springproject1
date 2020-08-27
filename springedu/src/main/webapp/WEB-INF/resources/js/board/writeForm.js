@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 const writeBtn  = document.getElementById("writeBtn");
 const cancelBtn = document.getElementById("cancelBtn");
 const listBtn   = document.getElementById("listBtn");
@@ -54,6 +57,7 @@ function checkValidation(){
 	}
 	document.getElementById('btitle.error').textContent = "";
 	
+	/*
 	//작성자
 	const bidTag = document.getElementById('bid');
 	if(bidTag.value.trim().length == 0){
@@ -69,6 +73,7 @@ function checkValidation(){
 		bidTag.select();
 		return false;
 	}
+	*/
 	//내용
 	const bcontentTag = document.getElementById('bcontent');
 	if(bcontentTag.value.trim().length < 4){
