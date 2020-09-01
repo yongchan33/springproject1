@@ -32,12 +32,13 @@ public class RboardDAOImplXMLTEST {
 //	int write(RboardVO rboardVO);
 	@Test
 	@DisplayName("댓글작성")
-	@Disabled
+//	@Disabled
 	void write() {
 		RboardVO rboardVO = new RboardVO();
-		rboardVO.setBnum(1129);
+		rboardVO.setBnum(1130);
 		rboardVO.setRid("test@test.com");
-		rboardVO.setRcontent("1129게시글에 대한 댓글 테스트중");
+		rboardVO.setRnickname("테스트터");
+		rboardVO.setRcontent("1130게시글에 대한 댓글 테스트중");
 		rboardDAO.write(rboardVO);		
 		
 		rboardVO = rboardDAO.replyView(rboardVO.getRnum());
@@ -81,7 +82,7 @@ public class RboardDAOImplXMLTEST {
 	@DisplayName("댓글목록")
 	@Disabled
 	void list() {
-		List<RboardVO> list = rboardDAO.list();
+		List<RboardVO> list = rboardDAO.list(1130,1,100);
 		
 		for(RboardVO rboardVO : list) {
 			logger.info(rboardVO.toString());
@@ -100,6 +101,7 @@ public class RboardDAOImplXMLTEST {
 //	int vote(VoteVO voteVO);	
 	@Test
 	@DisplayName("호감도투표")
+	@Disabled
 	void vote() {
 		VoteVO voteVO = new VoteVO();
 		

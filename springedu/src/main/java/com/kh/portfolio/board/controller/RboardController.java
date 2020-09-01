@@ -1,11 +1,16 @@
 package com.kh.portfolio.board.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,10 +29,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.portfolio.board.svc.RboardSVC;
 import com.kh.portfolio.board.vo.RboardVO;
 import com.kh.portfolio.board.vo.VoteVO;
+import com.kh.portfolio.common.page.PageCriteria;
 import com.kh.portfolio.exception.ErrorMsg;
 import com.kh.portfolio.exception.RestAccessException;
-
-import net.bytebuddy.implementation.bind.annotation.BindingPriority;
+import com.kh.portfolio.member.svc.MemberSVC;
+import com.kh.portfolio.member.vo.MemberVO;
 
 @RestController
 @RequestMapping("/rboard")
@@ -39,16 +45,27 @@ public class RboardController {
 	@Inject
 	RboardSVC rboardSVC;
 	
+	@Inject
+	MemberSVC memberSVC;
+	
 	//댓글작성
 	@PostMapping(value="", produces="application/json")
 	public ResponseEntity<String> write(
 			@Valid @RequestBody RboardVO	rboardVO,
-			BindingResult result
+			BindingResult result,
+			HttpServletRequest request
 			){
 		ResponseEntity<String> res = null;
 		
 		if(result.hasErrors()) {
 			throwRestAccessException(result);
+		}
+		
+		// 세션에서 아이디,별칭 가져오기 
+		MemberVO memberVO = (MemberVO)request.getSession(false).getAttribute("member");
+		if(memberVO != null) {
+			rboardVO.setRid(memberVO.getId());
+			rboardVO.setRnickname(memberVO.getNickname());
 		}
 		
 		int cnt = rboardSVC.write(rboardVO);
@@ -64,12 +81,20 @@ public class RboardController {
 	@PutMapping(value="",produces = "application/json")
 	public ResponseEntity<String> modify(
 		@Valid @RequestBody RboardVO rboardVO,	
-		BindingResult result	
+		BindingResult result,
+		HttpServletRequest request
 			){
 		ResponseEntity<String> res = null;
 		
 		if(result.hasErrors()) {
 			throwRestAccessException(result);
+		}
+		
+		// 세션에서 아이디,별칭 가져오기 
+		MemberVO memberVO = (MemberVO)request.getSession(false).getAttribute("member");
+		if(memberVO != null) {
+			rboardVO.setRid(memberVO.getId());
+			rboardVO.setRnickname(memberVO.getNickname());
 		}
 		
 		int cnt = rboardSVC.modify(rboardVO);
@@ -98,7 +123,8 @@ public class RboardController {
 	@PostMapping(value="/reply",produces = "application/json")
 	public ResponseEntity<String> reply(
 		@Valid @RequestBody RboardVO rboardVO,	
-		BindingResult result){
+		BindingResult result,
+		HttpServletRequest request){
 		
 		ResponseEntity<String> res = null;
 		
@@ -106,23 +132,62 @@ public class RboardController {
 			throwRestAccessException(result);
 		}
 		
+		// 세션에서 아이디,별칭 가져오기 
+		MemberVO memberVO = (MemberVO)request.getSession(false).getAttribute("member");
+		if(memberVO != null) {
+			rboardVO.setRid(memberVO.getId());
+			rboardVO.setRnickname(memberVO.getNickname());
+		}
+		
 		int cnt = rboardSVC.reply(rboardVO);
-		//성공
+		//성공	
 		if(cnt==1) {	
 			res = new ResponseEntity<String>("success",HttpStatus.OK); //200
 		}			
 		return res;
 	}	
 	//댓글목록
-	@GetMapping(value="/{reqPage}",produces = "application/json")
-	public ResponseEntity<List<RboardVO>> list(
-		@PathVariable(value="reqPage", required = true) String reqPage	
+	@GetMapping(value="/{reqPage}/{bnum}",produces = "application/json")
+	public ResponseEntity<Map<String,Object>> list(
+		@PathVariable(value="reqPage", required = false) Optional<Integer> reqPage,
+		@PathVariable(value="bnum",required = true) long bnum,
+		HttpServletRequest request
 			){
-		ResponseEntity<List<RboardVO>> res = null;
-				
-		List<RboardVO> list =	rboardSVC.list();
+		ResponseEntity<Map<String,Object>> res = null;
+		Map<String,Object> map = new HashMap();
+		
+		//1)댓글목록
+		List<RboardVO> list =	rboardSVC.list(reqPage.orElse(1), bnum);
+		
+		//2)페이징정보
+		PageCriteria pc = rboardSVC.getPageCriteria(reqPage.orElse(1));
+		
+		//3)로그인상태이고 프로파일 이미지가 있는경우 
+		//  이미지정보를 가져와서 base64변환
+		MemberVO memberVO = (MemberVO)request.getSession(false).getAttribute("member");
+		Map<String,String> memberImg = new HashMap();
+		if(memberVO != null) {
+			MemberVO member = memberSVC.listOneMember(memberVO.getId());
+			
+			//이미지 base64로 변환후 img태그에 적용하기위함
+			//BASE64의 핵심은 바이너리 데이터를 ASCII코드로 변경하는 인코딩 방식
+			if(member.getPic() != null) {
+				byte[] encoded = Base64.encodeBase64(member.getPic());
+				memberImg.put("pic", new String(encoded));
+				memberImg.put("ftype",member.getFtype());
+			}
+			
+			memberImg.put("rid",member.getId());
+			memberImg.put("nickname",member.getNickname());
+		}
+		
+		//4)Map에 댓글정보+페이정보담기
+		map.put("memberImg",memberImg);
+		map.put("list",list);
+		map.put("pc",pc);
+		
 		if(list.size() > 0) {
-			res = new ResponseEntity<List<RboardVO>>(list,HttpStatus.OK); //200
+			res = new ResponseEntity<Map<String,Object>>(map,HttpStatus.OK); //200
 		}
 		
 		return res;

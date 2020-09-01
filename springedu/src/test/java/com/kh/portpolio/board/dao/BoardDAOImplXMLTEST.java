@@ -94,14 +94,19 @@ public class BoardDAOImplXMLTEST {
 	}
 	@Test
 	@DisplayName("게시글목록")
-	@Disabled
+//	@Disabled
 	void list() {
+		
+		String searchType = "T";
+		String keyword = "제목1";
 		
 		recordCriteria.setReqPage(1);  			//요청페이지
 		recordCriteria.setRecNumPerPage(10);		//한페이지에 보여줄 레코드 수
 		
 		List<BoardVO> list = boardDAO.list(recordCriteria.getStarRec(),
-																			 recordCriteria.getEndRec());
+																			 recordCriteria.getEndRec(),
+																			 searchType,
+																			 keyword);
 		logger.info("레코드갯수:" + list.size());
 		
 //		list.stream().forEach((board)->{
@@ -213,20 +218,21 @@ public class BoardDAOImplXMLTEST {
 	
 	@Test
 	@DisplayName("샘플 게시글 작성")
+	@Disabled
 	void writeSampleData() {
 //    #{cid},
 //    #{btitle},
 //    #{id},
 //    #{nickname},
 //    #{bcontent},	
-		for(int i=1; i < 100; i++) {
+		for(int i=1; i < 325; i++) {
 			BoardVO boardVO = new BoardVO();
 			BoardCategoryVO boardCategoryVO = new BoardCategoryVO();
 			
 			boardVO.setBoardCategoryVO(boardCategoryVO);
-			boardVO.getBoardCategoryVO().setCid(1006);
+			boardVO.getBoardCategoryVO().setCid(1001);
 			boardVO.setBtitle("테스트 제목"+i);
-			boardVO.setBid("skslrk00@naver.com");
+			boardVO.setBid("sang105kr@gmail.com");
 			boardVO.setBnickname("별칭"+i);
 			boardVO.setBcontent("본문"+i);
 			
